@@ -65,6 +65,7 @@ function handleCredentialResponse(response) {
     if (loggedInUserSpan) {
         loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
     }
+        updateUserUI();
 }
 
 function prefillAuthor() {
