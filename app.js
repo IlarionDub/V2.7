@@ -51,7 +51,7 @@ function handleCredentialResponse(response) {
         email: data.email,
     };
     console.log("Logged in as:", loggedInUser.name);
-    document.getElementById("loggedInUser").innerText = `Welcome, ${loggedInUser.name}`;
+    document.getElementById("loggedInUser").innerText = `${loggedInUser.name}`;
 }
 function prefillAuthor() {
     const authorField = document.getElementById("author");
