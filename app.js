@@ -7,24 +7,29 @@ const BASE_URL = 'http://localhost:3000';
 let users1 = JSON.parse(localStorage.getItem("users1")) || [
     { name: "Admin", email: "admin@gmail.com", password: "Admin123", role: "admin" }
 ];
- 
+
 
 // Завантаження даних із сервера під час ініціалізації
 document.addEventListener("DOMContentLoaded", async () => {
     try {
+        const savedUser = localStorage.getItem('loggedInUser');
+        if (savedUser) {
+            loggedInUser = JSON.parse(savedUser);
+            console.log("Restored logged in user:", loggedInUser);
+        }
+
         posts = (await syncFromServer('posts')) || [];
         users = (await syncFromServer('users')) || [];
 
         console.log("Posts loaded:", posts);
         console.log("Users loaded:", users);
 
-        // Виконуємо інші ініціалізації
         await setupRouter();
         loadHomePage();
-        updateUserUI();
     } catch (error) {
         console.error("Error during initialization:", error);
     }
+
     updateUserUI();
 });
 
@@ -42,6 +47,7 @@ async function addOrUpdateData(dataType, newData) {
     // Синхронізуємо із сервером
     await syncToServer(dataType, [newData]);
 }
+
 function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
@@ -50,9 +56,17 @@ function handleCredentialResponse(response) {
         name: data.name,
         email: data.email,
     };
+
+    // Збереження користувача в localStorage
+    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+
     console.log("Logged in as:", loggedInUser.name);
-    document.getElementById("loggedInUser").innerText = `${loggedInUser.name}`;
+    const loggedInUserSpan = document.getElementById("loggedInUser");
+    if (loggedInUserSpan) {
+        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
+    }
 }
+
 function prefillAuthor() {
     const authorField = document.getElementById("author");
     if (loggedInUser && authorField) {
@@ -702,7 +716,6 @@ function updateUserUI() {
         loginButton?.classList.add("hidden");
         logoutButton?.classList.remove("hidden");
         loggedInUserSpan?.classList.remove("hidden");
-
         loggedInUserSpan.innerText = `Logged in as: ${loggedInUser}`;
     } else {
         loginButton?.classList.remove("hidden");
