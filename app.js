@@ -56,7 +56,6 @@ function handleCredentialResponse(response) {
         name: data.name,
         email: data.email,
     };
-
     // Збереження користувача в localStorage
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
@@ -65,8 +64,9 @@ function handleCredentialResponse(response) {
     if (loggedInUserSpan) {
         loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
     }
-        updateUserUI();
+    updateUserUI();
 }
+
 
 function prefillAuthor() {
     const authorField = document.getElementById("author");
