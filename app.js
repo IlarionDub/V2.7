@@ -5,7 +5,7 @@ let loggedInUser = null;
 const BASE_URL = 'http://localhost:3000';
 
 let users1 = JSON.parse(localStorage.getItem("users1")) || [
-    { name: "Admin", email: "admin@gmail.com", password: "Admin123", role: "admin" }
+    {name: "Admin", email: "admin@gmail.com", password: "Admin123", role: "admin"}
 ];
 
 
@@ -29,9 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 
-
-
- async function addOrUpdateData(dataType, newData) {
+async function addOrUpdateData(dataType, newData) {
     // Завантажуємо існуючі дані з локального сховища
     const existingData = JSON.parse(localStorage.getItem(dataType)) || [];
 
@@ -40,9 +38,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     localStorage.setItem(dataType, JSON.stringify(updatedData));
 
     // Синхронізуємо із сервером
-     await syncToServer(dataType, [newData]);
+    await syncToServer(dataType, [newData]);
 }
- function handleCredentialResponse(response) {
+
+
+
+function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
 
@@ -50,20 +51,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         name: data.name,
         email: data.email,
     };
-     
-     localStorage.setItem('users', JSON.stringify(users));
+
+
+    localStorage.setItem('users', JSON.stringify(users));
     console.log("Logged in as:", loggedInUser.name);
     document.getElementById("loggedInUser").innerText = `Logged in as: ${loggedInUser.name}`;
-}
- function prefillAuthor() {
-    const authorField = document.getElementById("author");
-    if (loggedInUser && authorField) {
-        authorField.value = loggedInUser.name;
-    }
     updateUserUI(login(data.name, data.email));
 
 }
 
+function prefillAuthor() {
+    const authorField = document.getElementById("author");
+    if (loggedInUser && authorField) {
+        authorField.value = loggedInUser.name;
+    }
+}
 
 
 async function syncToServer(dataType, dataArray) {
@@ -152,10 +154,7 @@ async function syncFromServer(dataType) {
 }
 
 
-
-
 // Запуск автоматичної синхронізації
-
 
 
 async function setupRouter() {
@@ -382,7 +381,7 @@ function loadPosts() {
 }
 
 function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 function showPost(index) {
@@ -459,8 +458,6 @@ function showPost(index) {
     `;
     updateUserUI();
 }
-
-
 
 
 async function showPostForm(isEdit = false, postIndex = null) {
@@ -706,8 +703,11 @@ function updateUserUI() {
         loginButton?.classList.add("hidden");
         logoutButton?.classList.remove("hidden");
         loggedInUserSpan?.classList.remove("hidden");
-
-        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser}`;
+        if (loggedInUser.authMethod === 'gmail') {
+            loggedInUserSpan.innerText = `Logged in as: ${loggedInUser}`;
+        } else {
+            loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
+        }
     } else {
         loginButton?.classList.remove("hidden");
         logoutButton?.classList.add("hidden");
