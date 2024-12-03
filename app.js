@@ -73,7 +73,7 @@ async function handleCredentialResponse(response) {
 }
 
 
-function prefillAuthor() {
+async function prefillAuthor() {
     const authorField = document.getElementById("author");
     if (loggedInUser && authorField) {
         authorField.value = loggedInUser.name;
