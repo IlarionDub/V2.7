@@ -50,7 +50,6 @@ async function handleCredentialResponse(response) {
     loggedInUser = {
         name: data.name,
         email: data.email,
-        authMethod: 'gmail' // Додаємо тип авторизації
     };
 
 await syncToServer('users', loggedInUser);
@@ -688,7 +687,6 @@ async function login(event) {
     loggedInUser = {
         name: user.name,
         email: user.email,
-        authMethod: 'manual' // Додаємо тип авторизації
     };
     await saveToLocalStorage();
     loadPosts();
@@ -708,14 +706,9 @@ function updateUserUI() {
     if (loggedInUser) {
         loginButton?.classList.add("hidden");
         logoutButton?.classList.remove("hidden");
-        loggedInUserSpan?.classList.remove("hidden");
-
-        // Умови для різних способів авторизації
-        if (loggedInUser.authMethod === 'gmail') {
-            loggedInUserSpan.innerText = `Logged in via Google: ${loggedInUser.name}`;
-        } else if (loggedInUser.authMethod === 'manual') {
-            loggedInUserSpan.innerText = `Logged in manually: ${loggedInUser}`;
-        }
+        loggedInUserSpan?.classList.remove("hidden");  
+        loggedInUserSpan.innerText = `${loggedInUser}`;
+    
     } else {
         loginButton?.classList.remove("hidden");
         logoutButton?.classList.add("hidden");
