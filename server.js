@@ -18,7 +18,10 @@ const corsOptions = {
 app.use(cors(corsOptions)); // Додаємо підтримку CORS
 app.use(middlewares);       // Використовуємо стандартні middlewares json-server
 app.use(express.json());    // Додаємо middleware для роботи з JSON
-
+app.use((req, res, next) => {
+    res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self'; img-src 'self'");
+    next();
+});
 // Налаштування маршруту
 app.use('/api', router);    // Додаємо маршрутизатор на /api (замість /)
 
