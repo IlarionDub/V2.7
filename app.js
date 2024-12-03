@@ -57,13 +57,9 @@ async function handleCredentialResponse(response) {
         email: users.email,
     };
 
-    localStorage.setItem('posts', JSON.stringify(posts));
-    localStorage.setItem('users', JSON.stringify(users));
 
-    // Синхронізуємо дані з сервером
-    await syncToServer('posts', posts);
-    await syncToServer('users', users);
-    // Збереження користувача в localStorage
+    await addOrUpdateData(users, loggedInUser);
+
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
     console.log("Logged in as:", loggedInUser.name);
