@@ -706,7 +706,7 @@ function updateUserUI() {
         logoutButton?.classList.remove("hidden");
         loggedInUserSpan?.classList.remove("hidden");
 
-        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser}`;
+        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
     } else {
         loginButton?.classList.remove("hidden");
         logoutButton?.classList.add("hidden");
