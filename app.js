@@ -8,7 +8,7 @@ let users1 = JSON.parse(localStorage.getItem("users1")) || [
     { name: "Admin", email: "admin@gmail.com", password: "Admin123", role: "admin" }
 ];
 
- 
+
 // Завантаження даних із сервера під час ініціалізації
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -42,24 +42,38 @@ async function addOrUpdateData(dataType, newData) {
     // Синхронізуємо із сервером
     await syncToServer(dataType, [newData]);
 }
-function handleCredentialResponse(response) {
+async function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
 
+    // Створюємо об'єкт авторизованого користувача
     loggedInUser = {
         name: data.name,
         email: data.email,
+        authMethod: "google" // Додаємо інформацію про спосіб авторизації
     };
+
+    // Перевіряємо, чи існує користувач у масиві
+    const usersArray = users || [];
+    let user = usersArray.find(user => user.email === loggedInUser.email);
+
+    // Якщо користувач не знайдений, додаємо його
+    if (!user) {
+        user = loggedInUser;
+        usersArray.push(user);
+        localStorage.setItem("users", JSON.stringify(usersArray)); // Оновлюємо локальне сховище
+    }
+
+    // Зберігаємо авторизованого користувача в локальне сховище
+    localStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
+
+    // Оновлюємо інтерфейс
+    loadPosts();
+    updateUserUI();
+
     console.log("Logged in as:", loggedInUser.name);
     document.getElementById("loggedInUser").innerText = `Welcome, ${loggedInUser.name}`;
 }
-function prefillAuthor() {
-    const authorField = document.getElementById("author");
-    if (loggedInUser && authorField) {
-        authorField.value = loggedInUser.name;
-    }
-}
-
 
 
 async function syncToServer(dataType, dataArray) {
