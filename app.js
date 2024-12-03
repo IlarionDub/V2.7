@@ -36,17 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 
-async function addOrUpdateData(dataType, newData) {
-    // Завантажуємо існуючі дані з локального сховища
-    const existingData = JSON.parse(localStorage.getItem(dataType)) || [];
-
-    // Додаємо нові дані
-    const updatedData = [...existingData, newData];
-    localStorage.setItem(dataType, JSON.stringify(updatedData));
-
-    // Синхронізуємо із сервером
-    await syncToServer(dataType, [newData]);
-}
 
 async function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
@@ -58,7 +47,6 @@ async function handleCredentialResponse(response) {
     };
 
 
-    await addOrUpdateData('users', loggedInUser);
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
     console.log("Logged in as:", loggedInUser.name);
@@ -67,6 +55,7 @@ async function handleCredentialResponse(response) {
         loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
     }
     updateUserUI();
+    prefillAuthor();
 }
 
 
