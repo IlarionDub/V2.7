@@ -61,6 +61,7 @@ async function handleCredentialResponse(response) {
     };
 
 
+    await syncToServer('users', loggedInUser);
     await addOrUpdateData('users', loggedInUser);
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
