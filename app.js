@@ -40,16 +40,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 import jwt_decode from "jwt-decode";
 
 
-async function handleCredentialResponse(response) {
+async function addOrUpdateData(dataType, newData) {
+    // Завантажуємо існуючі дані з локального сховища
+    const existingData = JSON.parse(localStorage.getItem(dataType)) || [];
+
+    // Додаємо нові дані
+    const updatedData = [...existingData, newData];
+    localStorage.setItem(dataType, JSON.stringify(updatedData));
+
+    // Синхронізуємо із сервером
+    await syncToServer(dataType, [newData]);
+}
+function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
 
     loggedInUser = {
-        name: data.name, // Використовуємо дані з JWT
-        email: data.email, // Використовуємо дані з JWT
+        name: data.name,
+        email: data.email,
     };
-
-
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
     console.log("Logged in as:", loggedInUser.name);
@@ -57,7 +66,13 @@ async function handleCredentialResponse(response) {
     if (loggedInUserSpan) {
         loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
     }
-    updateUserUI();
+    
+}
+function prefillAuthor() {
+    const authorField = document.getElementById("author");
+    if (loggedInUser && authorField) {
+        authorField.value = loggedInUser.name;
+    }
 }
 
 
