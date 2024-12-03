@@ -12,6 +12,13 @@ let users1 = JSON.parse(localStorage.getItem("users1")) || [
 // Завантаження даних із сервера під час ініціалізації
 document.addEventListener("DOMContentLoaded", async () => {
     try {
+         const savedUser = localStorage.getItem('loggedInUser');
+        if (savedUser) {
+            loggedInUser = JSON.parse(savedUser); // Відновлюємо loggedInUser
+            console.log("Restored logged in user:", loggedInUser);
+        } else {
+            loggedInUser = null;
+        }
         posts = (await syncFromServer('posts')) || [];
         users = (await syncFromServer('users')) || [];
 
