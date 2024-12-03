@@ -704,7 +704,7 @@ function updateUserUI() {
         logoutButton?.classList.remove("hidden");
         loggedInUserSpan?.classList.remove("hidden");
         if (loggedInUser.authMethod === 'gmail') {
-            loggedInUserSpan.innerText = `Logged in as: ${loggedInUser}`;
+            loggedInUserSpan.innerText = `Logged in via Gmail as: ${loggedInUser}`;
         } else {
             loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
         }
