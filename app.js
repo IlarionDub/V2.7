@@ -714,7 +714,7 @@ function updateUserUI() {
         if (loggedInUser.authMethod === 'gmail') {
             loggedInUserSpan.innerText = `Logged in via Google: ${loggedInUser.name}`;
         } else if (loggedInUser.authMethod === 'manual') {
-            loggedInUserSpan.innerText = `Logged in manually: ${loggedInUser.name}`;
+            loggedInUserSpan.innerText = `Logged in manually: ${loggedInUser}`;
         }
     } else {
         loginButton?.classList.remove("hidden");
