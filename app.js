@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (loggedInUser && authorField) {
         authorField.value = loggedInUser.name;
     }
-         updateUserUI();
+    updateUserUI(login(data.name, data.email));
 
 }
 
