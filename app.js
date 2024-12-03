@@ -43,6 +43,24 @@ async function addOrUpdateData(dataType, newData) {
 
 
 
+async function login(event) {
+    event.preventDefault();
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+
+    const user = users.find(user => user.email === email && user.password === password) ||
+        users1.find(user => user.email === email && user.password === password);
+
+    if (!user) {
+        alert("Invalid email or password!");
+        return;
+    }
+    await saveToLocalStorage();
+    loadPosts();
+    updateUserUI();
+}
+
+
 async function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
@@ -51,6 +69,7 @@ async function handleCredentialResponse(response) {
         name: data.name,
         email: data.email,
     };
+
 
 await syncToServer('users', loggedInUser);
     localStorage.setItem('users', JSON.stringify(loggedInUser));
@@ -672,26 +691,7 @@ function showLoginForm() {
     updateUserUI(); // Оновлення кнопок авторизації
 }
 
-async function login(event) {
-    event.preventDefault();
-    const email = document.getElementById("loginEmail").value;
-    const password = document.getElementById("loginPassword").value;
 
-    const user = users.find(user => user.email === email && user.password === password) ||
-        users1.find(user => user.email === email && user.password === password);
-
-    if (!user) {
-        alert("Invalid email or password!");
-        return;
-    }
-    loggedInUser = {
-        name: user.name,
-        email: user.email,
-    };
-    await saveToLocalStorage();
-    loadPosts();
-    updateUserUI();
-}
 
 function updateUserUI() {
     const loginButton = document.getElementById("loginButton");
@@ -706,9 +706,8 @@ function updateUserUI() {
     if (loggedInUser) {
         loginButton?.classList.add("hidden");
         logoutButton?.classList.remove("hidden");
-        loggedInUserSpan?.classList.remove("hidden");  
-        loggedInUserSpan.innerText = `${loggedInUser}`;
-    
+        loggedInUserSpan?.classList.remove("hidden");
+        loggedInUserSpan.innerText = `Logged in manually: ${loggedInUser}`;
     } else {
         loginButton?.classList.remove("hidden");
         logoutButton?.classList.add("hidden");
