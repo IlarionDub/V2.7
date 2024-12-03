@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 
-async function addOrUpdateData(dataType, newData) {
+ async function addOrUpdateData(dataType, newData) {
     // Завантажуємо існуючі дані з локального сховища
     const existingData = JSON.parse(localStorage.getItem(dataType)) || [];
 
@@ -40,9 +40,9 @@ async function addOrUpdateData(dataType, newData) {
     localStorage.setItem(dataType, JSON.stringify(updatedData));
 
     // Синхронізуємо із сервером
-    await syncToServer(dataType, [newData]);
+     await syncToServer(dataType, [newData]);
 }
-function handleCredentialResponse(response) {
+ function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
 
@@ -50,10 +50,11 @@ function handleCredentialResponse(response) {
         name: data.name,
         email: data.email,
     };
+     localStorage.setItem('users', JSON.stringify(users));
     console.log("Logged in as:", loggedInUser.name);
-    document.getElementById("loggedInUser").innerText = `Welcome, ${loggedInUser.name}`;
+    document.getElementById("loggedInUser").innerText = `Logged in as: ${loggedInUser.name}`;
 }
-function prefillAuthor() {
+ function prefillAuthor() {
     const authorField = document.getElementById("author");
     if (loggedInUser && authorField) {
         authorField.value = loggedInUser.name;
