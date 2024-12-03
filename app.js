@@ -55,17 +55,7 @@ async function handleCredentialResponse(response) {
         loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
     }
     updateUserUI();
-    prefillAuthor();
 }
-
-
-function prefillAuthor() {
-    const authorField = document.getElementById("author");
-    if (loggedInUser && authorField) {
-        authorField.value = loggedInUser.name;
-    }
-}
-
 
 
 async function syncToServer(dataType, dataArray) {
