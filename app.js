@@ -1,5 +1,3 @@
-
-
 let posts = [];
 let users = [];
 let currentPostIndex = 0;
@@ -14,20 +12,19 @@ let users1 = JSON.parse(localStorage.getItem("users1")) || [
 // Завантаження даних із сервера під час ініціалізації
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-       
-
         posts = (await syncFromServer('posts')) || [];
         users = (await syncFromServer('users')) || [];
 
         console.log("Posts loaded:", posts);
         console.log("Users loaded:", users);
 
+        // Виконуємо інші ініціалізації
         await setupRouter();
         loadHomePage();
+        updateUserUI();
     } catch (error) {
         console.error("Error during initialization:", error);
     }
-
     updateUserUI();
 });
 
@@ -45,32 +42,18 @@ async function addOrUpdateData(dataType, newData) {
     // Синхронізуємо із сервером
     await syncToServer(dataType, [newData]);
 }
-
-
-async function handleCredentialResponse(response) {
-    const data = jwtDecode(response.credential); // Розшифровка JWT
+function handleCredentialResponse(response) {
+    const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
 
     loggedInUser = {
-        name: data.name, // Використовуємо дані з JWT
-        email: data.email, // Використовуємо дані з JWT
+        name: data.name,
+        email: data.email,
     };
-
-
-    await syncToServer('users', loggedInUser);
-    await addOrUpdateData('users', loggedInUser);
-    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
-
     console.log("Logged in as:", loggedInUser.name);
-    const loggedInUserSpan = document.getElementById("loggedInUser");
-    if (loggedInUserSpan) {
-        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
-    }
-    updateUserUI();
+    document.getElementById("loggedInUser").innerText = `Welcome, ${loggedInUser.name}`;
 }
-
-
-async function prefillAuthor() {
+function prefillAuthor() {
     const authorField = document.getElementById("author");
     if (loggedInUser && authorField) {
         authorField.value = loggedInUser.name;
@@ -212,12 +195,12 @@ async function saveToLocalStorage() {
         // Синхронізуємо дані з сервером
         await syncToServer('posts', posts);
         await syncToServer('users', users);
+
         console.log("Data successfully saved to localStorage and synchronized with the server.");
     } catch (error) {
         console.error("Failed to synchronize data with the server. Data is saved in localStorage.", error);
     }
 }
-
 
 function loadHomePage() {
     const app = document.getElementById("app");
@@ -719,6 +702,7 @@ function updateUserUI() {
         loginButton?.classList.add("hidden");
         logoutButton?.classList.remove("hidden");
         loggedInUserSpan?.classList.remove("hidden");
+
         loggedInUserSpan.innerText = `Logged in as: ${loggedInUser}`;
     } else {
         loginButton?.classList.remove("hidden");
