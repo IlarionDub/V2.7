@@ -685,7 +685,11 @@ async function login(event) {
         alert("Invalid email or password!");
         return;
     }
-    loggedInUser = user.name;
+    loggedInUser = {
+        name: user.name,
+        email: user.email,
+        authMethod: 'manual' // Додаємо тип авторизації
+    };
     await saveToLocalStorage();
     loadPosts();
     updateUserUI();
@@ -696,7 +700,6 @@ function updateUserUI() {
     const logoutButton = document.getElementById("logoutButton");
     const loggedInUserSpan = document.getElementById("loggedInUser");
 
-    // Перевірка, чи елемент існує
     if (!loggedInUserSpan) {
         console.warn("Element with ID 'loggedInUser' not found in DOM.");
         return;
@@ -710,8 +713,8 @@ function updateUserUI() {
         // Умови для різних способів авторизації
         if (loggedInUser.authMethod === 'gmail') {
             loggedInUserSpan.innerText = `Logged in via Google: ${loggedInUser.name}`;
-        }else {
-            loggedInUserSpan.innerText = `Logged in: ${loggedInUser}`;
+        } else if (loggedInUser.authMethod === 'manual') {
+            loggedInUserSpan.innerText = `Logged in manually: ${loggedInUser.name}`;
         }
     } else {
         loginButton?.classList.remove("hidden");
