@@ -48,7 +48,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     loggedInUser = {
         name: data.name,
-        email: data.email,
     };
      localStorage.setItem('users', JSON.stringify(users));
     console.log("Logged in as:", loggedInUser.name);
