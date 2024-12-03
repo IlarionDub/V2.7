@@ -46,8 +46,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
 
-        loggedInUser = data.name
-
+    loggedInUser = {
+        name: data.name,
+        email: data.email,
+    };
+     
      localStorage.setItem('users', JSON.stringify(users));
     console.log("Logged in as:", loggedInUser.name);
     document.getElementById("loggedInUser").innerText = `Logged in as: ${loggedInUser.name}`;
