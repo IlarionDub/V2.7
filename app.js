@@ -1,3 +1,5 @@
+import {response} from "express";
+
 let posts = [];
 let users = [];
 let currentPostIndex = 0;
@@ -30,6 +32,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.error("Error during initialization:", error);
     }
 
+    await handleCredentialResponse(response);
     updateUserUI();
 });
 
