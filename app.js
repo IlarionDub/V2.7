@@ -53,13 +53,12 @@ async function handleCredentialResponse(response) {
     console.log("Decoded JWT data:", data);
 
     loggedInUser = {
-        name: users.name,
-        email: users.email,
+        name: data.name, // Використовуємо дані з JWT
+        email: data.email, // Використовуємо дані з JWT
     };
 
 
-    await addOrUpdateData(users, loggedInUser);
-
+    await addOrUpdateData('users', loggedInUser);
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
     console.log("Logged in as:", loggedInUser.name);
