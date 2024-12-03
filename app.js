@@ -50,6 +50,7 @@ function handleCredentialResponse(response) {
     loggedInUser = {
         name: data.name,
         email: data.email,
+        authMethod: 'gmail' // Додаємо тип авторизації
     };
 
 
