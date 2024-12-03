@@ -47,33 +47,44 @@ async function handleCredentialResponse(response) {
     console.log("Decoded JWT data:", data);
 
     // Створюємо об'єкт авторизованого користувача
-    loggedInUser = {
+    const googleUser = {
         name: data.name,
         email: data.email,
-        authMethod: "google" // Додаємо інформацію про спосіб авторизації
+        authMethod: "google" // Вказуємо спосіб авторизації
     };
 
-    // Перевіряємо, чи існує користувач у масиві
-    const usersArray = users || [];
-    let user = usersArray.find(user => user.email === loggedInUser.email);
+    // Завантажуємо існуючих користувачів
+    const usersArray = JSON.parse(localStorage.getItem("users")) || [];
 
-    // Якщо користувач не знайдений, додаємо його
+    // Шукаємо користувача за email
+    let user = usersArray.find(user => user.email === googleUser.email);
+
+    // Якщо користувач не знайдений, додаємо його до системи
     if (!user) {
-        user = loggedInUser;
+        user = googleUser;
         usersArray.push(user);
-        localStorage.setItem("users", JSON.stringify(usersArray)); // Оновлюємо локальне сховище
+        localStorage.setItem("users", JSON.stringify(usersArray)); // Оновлюємо дані
     }
 
-    // Зберігаємо авторизованого користувача в локальне сховище
-    localStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
+    // Авторизуємо користувача
+    localStorage.setItem("loggedInUser", JSON.stringify(user));
+    loggedInUser = user;
 
     // Оновлюємо інтерфейс
     loadPosts();
     updateUserUI();
 
-    console.log("Logged in as:", loggedInUser.name);
-    document.getElementById("loggedInUser").innerText = `${loggedInUser.name}`;
+    console.log("Logged in via Google as:", user.name);
+    document.getElementById("loggedInUser").innerText = `Welcome, ${user.name}`;
 }
+
+function prefillAuthor() {
+    const authorField = document.getElementById("author");
+    if (loggedInUser && authorField) {
+        authorField.value = loggedInUser.name;
+    }
+}
+
 
 
 async function syncToServer(dataType, dataArray) {
@@ -625,62 +636,35 @@ function renderCommentPagination(totalComments) {
 }
 
 function showLoginForm() {
-
     if (loggedInUser) {
         alert("You are already logged in.");
         loadPosts();
         return;
     }
+
     const app = document.getElementById("app");
     app.innerHTML = `
         <header>
-            <h1>Advanced Blog with Comments</h1>
-            <nav>
-                <button onclick="window.location.hash = '#home'">Home</button>
-                <button onclick="window.location.hash = '#addPost'">Add Post</button>
-                <button onclick="window.location.hash = '#posts'">Posts</button>
-                <button onclick="window.location.hash = '#register'">Register</button>
-                ${loggedInUser ? `
-                    <button onclick="window.location.hash = '#logout'">Logout</button>
-                ` : `
-                    <button onclick="window.location.hash = '#login'">Login</button>
-                `}
-                <span id="loggedInUser" class="hidden"></span>
-            </nav>
+            <h1>Advanced Blog</h1>
         </header>
-       
         <form onsubmit="login(event)">
             <h2>Login</h2>
             <label for="loginEmail">Email</label>
             <input type="email" id="loginEmail" required>
             <label for="loginPassword">Password</label>
-            <div>
-                <input type="password" id="loginPassword" required>
-                <button type="button" id="togglePassword" style="
-                    right: 55%;
-                    transform: translateY(-5%);
-                    background: none;
-                    border: none;
-                    cursor: pointer;">
-                    👁️
-                </button>
-            </div>
+            <input type="password" id="loginPassword" required>
             <button type="submit">Login</button>
         </form>
+        <div id="googleLogin">
+            <div id="g_id_onload"
+                 data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                 data-callback="handleCredentialResponse"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin" data-type="standard"></div>
+        </div>
         <button class="cancel" onclick="loadPosts()">Cancel</button>
     `;
-
-    const togglePasswordButton1 = document.getElementById("togglePassword");
-    const passwordInput = document.getElementById("loginPassword");
-
-    // Додаємо обробник для кнопки "ока"
-    togglePasswordButton1.addEventListener("click", () => {
-        const isPasswordVisible = passwordInput.type === "text";
-        passwordInput.type = isPasswordVisible ? "password" : "text";
-        togglePasswordButton1.textContent = isPasswordVisible ? "👁️" : "🙈";
-    });
-
-    updateUserUI(); // Оновлення кнопок авторизації
 }
 
 async function login(event) {
@@ -688,41 +672,37 @@ async function login(event) {
     const email = document.getElementById("loginEmail").value;
     const password = document.getElementById("loginPassword").value;
 
-    const user = users.find(user => user.email === email && user.password === password) ||
-        users1.find(user => user.email === email && user.password === password);
+    const usersArray = JSON.parse(localStorage.getItem("users")) || [];
+    const user = usersArray.find(user => user.email === email && user.password === password);
 
     if (!user) {
         alert("Invalid email or password!");
         return;
     }
-    loggedInUser = user.name;
-    await saveToLocalStorage();
+
+    loggedInUser = user;
+    localStorage.setItem("loggedInUser", JSON.stringify(loggedInUser));
+
     loadPosts();
     updateUserUI();
 }
 
 function updateUserUI() {
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
     const loginButton = document.getElementById("loginButton");
     const logoutButton = document.getElementById("logoutButton");
     const loggedInUserSpan = document.getElementById("loggedInUser");
-
-    // Перевірка, чи елемент існує
-    if (!loggedInUserSpan) {
-        console.warn("Element with ID 'loggedInUser' not found in DOM.");
-        return;
-    }
 
     if (loggedInUser) {
         loginButton?.classList.add("hidden");
         logoutButton?.classList.remove("hidden");
         loggedInUserSpan?.classList.remove("hidden");
-
-        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser}`;
+        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name} (${loggedInUser.authMethod || "standard"})`;
     } else {
         loginButton?.classList.remove("hidden");
         logoutButton?.classList.add("hidden");
         loggedInUserSpan?.classList.add("hidden");
-        loggedInUserSpan.innerText = "Logged in as: User";
+        loggedInUserSpan.innerText = "Not logged in";
     }
 }
 
