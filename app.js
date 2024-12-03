@@ -710,9 +710,7 @@ function updateUserUI() {
         // Умови для різних способів авторизації
         if (loggedInUser.authMethod === 'gmail') {
             loggedInUserSpan.innerText = `Logged in via Google: ${loggedInUser.name}`;
-        } else if (loggedInUser.authMethod === 'manual') {
-            loggedInUserSpan.innerText = `Logged in with email/password: ${loggedInUser}`;
-        } else {
+        }else {
             loggedInUserSpan.innerText = `Logged in: ${loggedInUser}`;
         }
     } else {
