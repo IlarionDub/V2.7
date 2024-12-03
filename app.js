@@ -48,14 +48,21 @@ async function addOrUpdateData(dataType, newData) {
     await syncToServer(dataType, [newData]);
 }
 
-function handleCredentialResponse(response) {
+async function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
 
     loggedInUser = {
-        name: data.name,
-        email: data.email,
+        name: users.name,
+        email: users.email,
     };
+
+    localStorage.setItem('posts', JSON.stringify(posts));
+    localStorage.setItem('users', JSON.stringify(users));
+
+    // Синхронізуємо дані з сервером
+    await syncToServer('posts', posts);
+    await syncToServer('users', users);
     // Збереження користувача в localStorage
     localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
 
@@ -210,12 +217,12 @@ async function saveToLocalStorage() {
         // Синхронізуємо дані з сервером
         await syncToServer('posts', posts);
         await syncToServer('users', users);
-
         console.log("Data successfully saved to localStorage and synchronized with the server.");
     } catch (error) {
         console.error("Failed to synchronize data with the server. Data is saved in localStorage.", error);
     }
 }
+
 
 function loadHomePage() {
     const app = document.getElementById("app");
