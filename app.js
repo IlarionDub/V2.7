@@ -9,7 +9,6 @@ let users1 = JSON.parse(localStorage.getItem("users1")) || [
 ];
 
 
-
 // Завантаження даних із сервера під час ініціалізації
 document.addEventListener("DOMContentLoaded", async () => {
     try {
@@ -56,6 +55,8 @@ function handleCredentialResponse(response) {
 
     localStorage.setItem('users', JSON.stringify(users));
     console.log("Logged in as:", loggedInUser.name);
+    console.log("Logged in as:", loggedInUser.email);
+
     document.getElementById("loggedInUser").innerText = `Logged in as: ${loggedInUser.name}`;
     updateUserUI(login(data.name, data.email));
 
@@ -705,7 +706,7 @@ function updateUserUI() {
         logoutButton?.classList.remove("hidden");
         loggedInUserSpan?.classList.remove("hidden");
 
-        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser}`;
+        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
     } else {
         loginButton?.classList.remove("hidden");
         logoutButton?.classList.add("hidden");
