@@ -706,12 +706,19 @@ function updateUserUI() {
         logoutButton?.classList.remove("hidden");
         loggedInUserSpan?.classList.remove("hidden");
 
-        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
+        // Умови для різних способів авторизації
+        if (loggedInUser.authMethod === 'gmail') {
+            loggedInUserSpan.innerText = `Logged in via Google: ${loggedInUser.name}`;
+        } else if (loggedInUser.authMethod === 'manual') {
+            loggedInUserSpan.innerText = `Logged in with email/password: ${loggedInUser}`;
+        } else {
+            loggedInUserSpan.innerText = `Logged in: ${loggedInUser}`;
+        }
     } else {
         loginButton?.classList.remove("hidden");
         logoutButton?.classList.add("hidden");
         loggedInUserSpan?.classList.add("hidden");
-        loggedInUserSpan.innerText = "Logged in as: User";
+        loggedInUserSpan.innerText = "Not logged in";
     }
 }
 
