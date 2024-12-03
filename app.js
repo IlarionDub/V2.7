@@ -5,7 +5,7 @@ let loggedInUser = null;
 const BASE_URL = 'http://localhost:3000';
 
 let users1 = JSON.parse(localStorage.getItem("users1")) || [
-    { name: "Admin", email: "admin@gmail.com", password: "Admin123", role: "admin" }
+    {name: "Admin", email: "admin@gmail.com", password: "Admin123", role: "admin"}
 ];
 
 
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 
-
+import jwt_decode from "jwt-decode";
 
 
 async function handleCredentialResponse(response) {
@@ -144,10 +144,7 @@ async function syncFromServer(dataType) {
 }
 
 
-
-
 // Запуск автоматичної синхронізації
-
 
 
 async function setupRouter() {
@@ -374,7 +371,7 @@ function loadPosts() {
 }
 
 function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 function showPost(index) {
@@ -451,8 +448,6 @@ function showPost(index) {
     `;
     updateUserUI();
 }
-
-
 
 
 async function showPostForm(isEdit = false, postIndex = null) {
@@ -698,7 +693,7 @@ function updateUserUI() {
         loginButton?.classList.add("hidden");
         logoutButton?.classList.remove("hidden");
         loggedInUserSpan?.classList.remove("hidden");
-        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser}`;
+        loggedInUserSpan.innerText = `Logged in as: ${loggedInUser.name}`;
     } else {
         loginButton?.classList.remove("hidden");
         logoutButton?.classList.add("hidden");
