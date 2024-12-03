@@ -72,7 +72,7 @@ async function handleCredentialResponse(response) {
     updateUserUI();
 
     console.log("Logged in as:", loggedInUser.name);
-    document.getElementById("loggedInUser").innerText = `Welcome, ${loggedInUser.name}`;
+    document.getElementById("loggedInUser").innerText = `${loggedInUser.name}`;
 }
 
 
