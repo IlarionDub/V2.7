@@ -8,7 +8,7 @@ let users1 = JSON.parse(localStorage.getItem("users1")) || [
     { name: "Admin", email: "admin@gmail.com", password: "Admin123", role: "admin" }
 ];
 
-
+ 
 // Завантаження даних із сервера під час ініціалізації
 document.addEventListener("DOMContentLoaded", async () => {
     try {
