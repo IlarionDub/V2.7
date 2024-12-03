@@ -2,7 +2,7 @@ let posts = [];
 let users = [];
 let currentPostIndex = 0;
 let loggedInUser = null;
-const BASE_URL = 'http://localhost:3000'; // Актуальний URL
+const BASE_URL = 'http://localhost:3000';
 
 let users1 = JSON.parse(localStorage.getItem("users1")) || [
     { name: "Admin", email: "admin@gmail.com", password: "Admin123", role: "admin" }
@@ -31,6 +31,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 
 
+async function addOrUpdateData(dataType, newData) {
+    // Завантажуємо існуючі дані з локального сховища
+    const existingData = JSON.parse(localStorage.getItem(dataType)) || [];
+
+    // Додаємо нові дані
+    const updatedData = [...existingData, newData];
+    localStorage.setItem(dataType, JSON.stringify(updatedData));
+
+    // Синхронізуємо із сервером
+    await syncToServer(dataType, [newData]);
+}
 function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
@@ -53,7 +64,7 @@ function prefillAuthor() {
 
 async function syncToServer(dataType, dataArray) {
     try {
-        // Завантажуємо всі існуюdчі записи з сервера
+        // Завантажуємо всі існуючі записи з сервера
         const response = await fetch(`${BASE_URL}/${dataType}`);
         const existingData = await response.json();
 
@@ -61,7 +72,6 @@ async function syncToServer(dataType, dataArray) {
             // Перевіряємо, чи існує запис із такими самими властивостями (окрім ID)
             const existingItem = existingData.find(existing => {
                 if (dataType === 'posts') {
-                    // Для постів порівнюємо всі властивості, окрім ID
                     return (
                         existing.title === item.title &&
                         existing.content === item.content &&
@@ -70,7 +80,6 @@ async function syncToServer(dataType, dataArray) {
                         existing.author === item.author
                     );
                 } else if (dataType === 'users') {
-                    // Для користувачів порівнюємо всі властивості, окрім ID
                     return (
                         existing.name === item.name &&
                         existing.email === item.email &&
@@ -98,8 +107,14 @@ async function syncToServer(dataType, dataArray) {
             });
             console.log(`Added new ${dataType.slice(0, -1)} to server:`, item);
         }
+
+        // Оновлюємо локальне сховище після успішної синхронізації
+        localStorage.setItem(dataType, JSON.stringify(dataArray));
     } catch (error) {
-        console.error(`Failed to sync ${dataType}:`, error);
+        console.error(`Failed to sync ${dataType} to server:`, error);
+
+        // Якщо сервер недоступний, лише оновлюємо локальне сховище
+        localStorage.setItem(dataType, JSON.stringify(dataArray));
     }
 }
 
@@ -107,28 +122,30 @@ async function syncToServer(dataType, dataArray) {
 // Функція для отримання даних із сервера
 async function syncFromServer(dataType) {
     try {
+        // Підключення до сервера
         const response = await fetch(`${BASE_URL}/${dataType}`);
         const data = await response.json();
+
         console.log(`${dataType} synced from server:`, data);
 
-        // Зберігаємо дані в localStorage як кеш
+        // Зберігаємо отримані дані в localStorage
         localStorage.setItem(dataType, JSON.stringify(data));
         return data;
     } catch (error) {
         console.error(`Error fetching ${dataType}:`, error.message);
 
-        // Якщо сервер недоступний, беремо дані з localStorage
+        // Якщо сервер недоступний, використовуємо дані з localStorage
         const cachedData = localStorage.getItem(dataType);
         if (cachedData) {
             console.warn(`Using cached ${dataType} data`);
             return JSON.parse(cachedData);
         }
 
-        // Якщо кешу немає, повідомляємо про критичну проблему
-        throw new Error(`Failed to fetch ${dataType} and no cached data is available.`);
+        // Якщо кеш недоступний, повертаємо порожній масив
+        console.warn(`No cached data available for ${dataType}.`);
+        return [];
     }
 }
-
 
 
 
@@ -170,8 +187,19 @@ async function handleRouteChange() {
 }
 
 async function saveToLocalStorage() {
-    await syncToServer('posts', posts); // Синхронізуємо пости
-    await syncToServer('users', users); // Синхронізуємо користувачі
+    try {
+        // Оновлюємо локальне сховище
+        localStorage.setItem('posts', JSON.stringify(posts));
+        localStorage.setItem('users', JSON.stringify(users));
+
+        // Синхронізуємо дані з сервером
+        await syncToServer('posts', posts);
+        await syncToServer('users', users);
+
+        console.log("Data successfully saved to localStorage and synchronized with the server.");
+    } catch (error) {
+        console.error("Failed to synchronize data with the server. Data is saved in localStorage.", error);
+    }
 }
 
 function loadHomePage() {
@@ -179,7 +207,7 @@ function loadHomePage() {
     updateUserUI();
 
     app.innerHTML = `
-        <h11>
+    <header class="h11">
         <h2>Welcome to the Advanced Blog!</h2>
         <p>Choose an option to get started:</p>
         <div class="button-group">
@@ -188,7 +216,7 @@ function loadHomePage() {
           <button onclick="window.location.hash = '#register'">Register</button>
           <button onclick="window.location.hash = '#login'">Login</button>
         </div>
-        </h11>
+        </header>
        
     `;
 
