@@ -43,7 +43,7 @@ async function addOrUpdateData(dataType, newData) {
 
 
 
-function handleCredentialResponse(response) {
+async function handleCredentialResponse(response) {
     const data = jwt_decode(response.credential); // Розшифровка JWT
     console.log("Decoded JWT data:", data);
 
@@ -53,8 +53,8 @@ function handleCredentialResponse(response) {
         authMethod: 'gmail' // Додаємо тип авторизації
     };
 
-
-    localStorage.setItem('users', JSON.stringify(users));
+await syncToServer('users', loggedInUser);
+    localStorage.setItem('users', JSON.stringify(loggedInUser));
     console.log("Logged in as:", loggedInUser.name);
     console.log("Logged in as:", loggedInUser.email);
 
